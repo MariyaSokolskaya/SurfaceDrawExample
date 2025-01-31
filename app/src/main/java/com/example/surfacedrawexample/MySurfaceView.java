@@ -12,6 +12,8 @@ import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+
 public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     Bitmap image;
     float x, y, touchX, touchY; //координаты рисунка и точки касания
@@ -22,6 +24,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     SurfaceHolder holder;
     DrawThread drawThread;//поток рисования
 
+    ArrayList<Sprite> sprites = new ArrayList<>();
+
     public MySurfaceView(Context context) {
         super(context);
         holder = getHolder();
@@ -30,16 +34,19 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         x = 400;
         y = 300;
         resources = getResources();
-        image = BitmapFactory.decodeResource(resources, R.drawable.cathead);
+        image = BitmapFactory.decodeResource(resources, R.drawable.sprites);
         speed = 20;//коэффициент скорости
     }
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawBitmap(image, x, y, paint);
-        x += dx;
-        y += dy;
+        //canvas.drawBitmap(image, x, y, paint);
+        //x += dx;
+        //y += dy;
+        for (Sprite s : sprites) {
+            s.draw(canvas);
+        }
     }
 
     @Override
@@ -47,7 +54,13 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         if(event.getAction() == MotionEvent.ACTION_DOWN){
             touchX = event.getX();
             touchY = event.getY();
-            calculate();
+            //calculate();
+            for (Sprite s: sprites) {
+                s.setTouchX(touchX);
+                s.setTouchY(touchY);
+            }
+            Sprite sprite = new Sprite(image, this, touchX, touchY);
+            sprites.add(sprite);
         }
         return true;
     }
