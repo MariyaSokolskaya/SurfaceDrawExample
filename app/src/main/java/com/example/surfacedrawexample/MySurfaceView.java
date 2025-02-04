@@ -25,6 +25,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     DrawThread drawThread;//поток рисования
 
     ArrayList<Sprite> sprites = new ArrayList<>();
+    Sprite character;
+
+    boolean isMapGenerate = false;
+    MapWorker mapWorker;
 
     public MySurfaceView(Context context) {
         super(context);
@@ -32,10 +36,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         holder.addCallback(this);//"активируем" интерфейс SurfaceHolder.Callback
         paint = new Paint();
         x = 400;
-        y = 300;
+        y = 1100;
         resources = getResources();
         image = BitmapFactory.decodeResource(resources, R.drawable.sprites);
         speed = 20;//коэффициент скорости
+        character = new Sprite(image, this, x, y);
     }
 
     @Override
@@ -44,9 +49,17 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         //canvas.drawBitmap(image, x, y, paint);
         //x += dx;
         //y += dy;
-        for (Sprite s : sprites) {
+       /* for (Sprite s : sprites) {
             s.draw(canvas);
+        }*/
+        if(!isMapGenerate){
+            mapWorker = new MapWorker(canvas.getWidth(), canvas.getHeight(), resources);
+            isMapGenerate = true;
         }
+        mapWorker.draw(canvas);
+        character.draw(canvas);
+
+        mapWorker.changeMap();
     }
 
     @Override
@@ -55,12 +68,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             touchX = event.getX();
             touchY = event.getY();
             //calculate();
-            for (Sprite s: sprites) {
+            /*for (Sprite s: sprites) {
                 s.setTouchX(touchX);
                 s.setTouchY(touchY);
             }
             Sprite sprite = new Sprite(image, this, touchX, touchY);
-            sprites.add(sprite);
+            sprites.add(sprite);*/
+            character.setTouchX(touchX);
+            character.setTouchY(touchY);
         }
         return true;
     }
